@@ -1,0 +1,61 @@
+on: push
+name: npm build, lint, test and publish
+jobs:
+  build-and-publish:
+    name: build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: npm install
+        uses: actions/npm@master
+        with:
+          args: install
+      - name: npm test
+        uses: actions/npm@master
+        with:
+          args: run test
+      - name: npm lint
+        uses: actions/npm@master
+        with:
+          args: run lint
+
+  build-docker:
+    name: build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: docker build
+        uses: actions/docker/cli@master
+        with:
+          args: build -t test .
+
+jobs:
+  example_matrix:
+    strategy:
+      matrix:
+        os: [ ubuntu-latest,ubuntu-latest]
+        node: [16, 16]
+        include:
+          - os: ubuntu-latest
+            node: 16
+            npm: 8
+    runs-on: ${{ matrix.node }}
+    steps:
+      - uses: actions/checkout@master
+      - name: npm install
+        uses: actions/npm@master
+        with:
+          args: install
+      - name: npm test
+        uses: actions/npm@master
+        with:
+          args: run test
+      - name: npm lint
+        uses: actions/npm@master
+        with:
+          args: run lint
+      - name: docker build
+        uses: actions/docker/cli@master
+        with:
+          args: build -t test .
+      - if: ${{ matrix.npm }}
