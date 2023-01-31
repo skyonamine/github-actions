@@ -51,7 +51,7 @@ jobs:
         run: npm lint
       - name: test
         if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
-        un: npm test
+        run: npm test
       - name: Docker
         if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
         uses: actions/docker/cli@master
