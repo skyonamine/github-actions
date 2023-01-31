@@ -41,20 +41,13 @@ jobs:
             npm: 8
     runs-on: ${{ matrix.node }}
     steps:
-      - name: npm install
-        uses: actions/npm@master
+      - uses: actions/checkout@master
+      - name: Setup node
+        uses: actions/setup-node@v3
         with:
-          args: install
-      - name: npm test
-        uses: actions/npm@master
-        with:
-          args: run test
-      - name: npm lint
-        uses: actions/npm@master
-        with:
-          args: run lint
+          node-version: ${{ matrix.node }}
+      - run: npm lint
+      - run: npm test
       - name: docker build
-        uses: actions/docker/cli@master
-        with:
-          args: build -t test .
+        run: docker build -t test .
       - if: ${{ matrix.npm }}
