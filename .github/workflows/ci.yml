@@ -33,13 +33,9 @@ jobs:
   example_matrix:
     strategy:
       matrix:
-        os: [ ubuntu-latest,ubuntu-latest]
-        node: [16, 16]
-        include:
-          - os: ubuntu-latest
-            node: 16
-            npm: 8
-    runs-on: ${{ matrix.node }}
+        os: [ ubuntu-latest]
+        environment: [build, docker]
+    runs-on: ${{ matrix.environment }}
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js ${{ matrix.node-version }}
@@ -47,8 +43,17 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
-      - run: npm install
-      - run: npm lint
-      - run: npm test
-      # - run: docker build -t test .
-      # - if: ${{ matrix.npm }}
+      - name: install
+        if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
+        run: npm install
+      - name: lint
+        if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
+        run: npm lint
+      - name: test
+        if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
+        un: npm test
+      - name: Docker
+        if: ${{ github.event.inputs.environment == 'docker' || (matrix.environment == 'build') }}
+        uses: actions/docker/cli@master
+        with:
+          args: build -t test .
